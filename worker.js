@@ -1,7 +1,7 @@
 export default {
   async fetch(request, env) {
     const origin = request.headers.get("Origin") || "";
-    const allowedOrigins = ["https://iaagency.online/"]; // ← tu dominio real
+    const allowedOrigins = ["https://iaagency.online"]; // ← tu dominio real
 
     const corsHeaders = {
       "Access-Control-Allow-Origin": allowedOrigins.includes(origin) ? origin : "",
