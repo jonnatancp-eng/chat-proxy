@@ -1,27 +1,34 @@
 export default {
   async fetch(request, env) {
-    // Solo aceptar POST
+    const origin = request.headers.get("Origin") || "";
+    const allowedOrigins = ["https://iaagency.online/"]; // ← tu dominio real
+
+    const corsHeaders = {
+      "Access-Control-Allow-Origin": allowedOrigins.includes(origin) ? origin : "",
+      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type",
+    };
+
+    // Manejar preflight OPTIONS
+    if (request.method === "OPTIONS") {
+      return new Response(null, { status: 204, headers: corsHeaders });
+    }
+
     if (request.method !== "POST") {
       return new Response("Method not allowed", { status: 405 });
     }
-
-    // CORS — permite peticiones desde tu dominio
-    const origin = request.headers.get("Origin") || "";
-    const allowedOrigins = ["https://iaagency.online/"]; // ← cambia esto
 
     if (!allowedOrigins.includes(origin)) {
       return new Response("Forbidden", { status: 403 });
     }
 
-    // Leer el body del frontend
     const body = await request.json();
 
-    // Llamar a n8n con el token secreto
     const n8nResponse = await fetch(env.N8N_WEBHOOK_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-api-key": env.N8N_API_KEY, // ← token secreto, nunca expuesto
+        "x-api-key": env.N8N_API_KEY,
       },
       body: JSON.stringify(body),
     });
@@ -31,8 +38,8 @@ export default {
     return new Response(data, {
       status: n8nResponse.status,
       headers: {
+        ...corsHeaders,
         "Content-Type": n8nResponse.headers.get("Content-Type") || "text/plain",
-        "Access-Control-Allow-Origin": origin,
       },
     });
   }
