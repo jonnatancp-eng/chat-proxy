@@ -3,8 +3,8 @@ export default {
     const origin = request.headers.get("Origin") || "";
     const allowedOrigins = ["https://iaagency.online"]; // ← tu dominio real
 
-    const corsHeaders = {
-      "Access-Control-Allow-Origin": allowedOrigins.includes(origin) ? origin : "",
+      const corsHeaders = {
+      "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "POST, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type",
     };
@@ -17,10 +17,10 @@ export default {
     if (request.method !== "POST") {
       return new Response("Method not allowed", { status: 405 });
     }
-
-    if (!allowedOrigins.includes(origin)) {
-      return new Response("Forbidden", { status: 403 });
-    }
+    
+    //if (!allowedOrigins.includes(origin)) {
+    //return new Response("Forbidden", { status: 403 });
+    //}
 
     const body = await request.json();
 
